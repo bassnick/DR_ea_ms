@@ -28,37 +28,62 @@ class _NewDreamPageState extends State<NewDreamPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black38,
-
-      appBar: AppBar(
-        title: Text(
+        backgroundColor: Colors.black38,
+        appBar: AppBar(
+          title: Text(
             widget.title,
-        style: TextStyle(
-          color: Colors.green
-        ),),
-      ),
-      body: TextField(
-        style: TextStyle(
-          color: Colors.white38
+            style: TextStyle(color: Colors.green),
+          ),
         ),
-        cursorColor: Colors.white38,
-        keyboardType: TextInputType.multiline,
-        maxLength: null,
-        maxLines: null,
-        autofocus: true,
-        decoration: InputDecoration(
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.green, width: 4.0),
+        body: Column(children: [
+          TextField(
+            style: TextStyle(color: Colors.white38),
+            cursorColor: Colors.white38,
+            keyboardType: TextInputType.multiline,
+            maxLength: null,
+            maxLines: null,
+            autofocus: true,
+            decoration: InputDecoration(
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.green, width: 4.0),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.red, width: 2.0),
+                ),
+                hintText: 'Enter the dream'),
+          ),
+              Row( mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+
+                    OutlinedButton(
+
+              onPressed: () {
+                // Respond to button press
+              },
+              child: Text(
+                "Next dream",
+                style: TextStyle(color: Colors.green),
+              ),
             ),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.red, width: 2.0),
+            OutlinedButton(
+              onPressed: () {
+                // Respond to button press
+              },
+              child: Text(
+                "List of dreams",
+                style: TextStyle(color: Colors.green),
+              ),
             ),
-            hintText: 'Enter the dream'),
-      ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
-    );
+            OutlinedButton(
+              onPressed: () {
+                // Respond to button press
+              },
+              child: Text(
+                "Save",
+                style: TextStyle(color: Colors.green),
+              ),
+            )
+          ]),
+        ]));
   }
 }
