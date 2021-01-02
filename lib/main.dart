@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());
@@ -25,6 +26,9 @@ class NewDreamPage extends StatefulWidget {
 }
 
 class _NewDreamPageState extends State<NewDreamPage> {
+  TextEditingController inputDream =new TextEditingController();
+  String valueDream = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,6 +41,7 @@ class _NewDreamPageState extends State<NewDreamPage> {
         ),
         body: Column(children: [
           TextField(
+            controller: inputDream,
             style: TextStyle(color: Colors.white38),
             cursorColor: Colors.white38,
             keyboardType: TextInputType.multiline,
@@ -66,16 +71,22 @@ class _NewDreamPageState extends State<NewDreamPage> {
               ),
             ),
             OutlinedButton(
-              onPressed: () {
+
+            onPressed: () {
                 // Respond to button press
               },
-              child: Text(
+              child:
+              Text(
                 "List of dreams",
                 style: TextStyle(color: Colors.green),
               ),
             ),
             OutlinedButton(
-              onPressed: () {
+              onPressed: () async {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                final old = prefs.getString('dream') ?? "";
+                valueDream = old + " " + inputDream.text;
+                prefs.setString('dream', valueDream);
                 // Respond to button press
               },
               child: Text(
@@ -87,3 +98,5 @@ class _NewDreamPageState extends State<NewDreamPage> {
         ]));
   }
 }
+
+
