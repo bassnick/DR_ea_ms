@@ -96,7 +96,11 @@ class _NewDreamPageState extends State<NewDreamPage> {
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             OutlinedButton(
               onPressed: () {
-                // Respond to button press
+                save();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NewDreamPage(title: 'New Dream')),
+                );
               },
               child: Text(
                 "Next dream",
@@ -114,23 +118,7 @@ class _NewDreamPageState extends State<NewDreamPage> {
             ),
             OutlinedButton(
               onPressed: () async {
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                final count = ((prefs.getInt('counter') ?? 0) + 1);
-                prefs.setInt('counter', count);
-                prefs.setString('dream' + count.toString(), inputDream.text);
-                var today = DateTime.now();
-                prefs.setString(
-                    'date' + count.toString(),
-                    (today.year.toString() +
-                        "-" +
-                        today.month.toString().padLeft(2, '0') +
-                        "-" +
-                        today.day.toString().padLeft(2, '0') +
-                        " " +
-                        today.hour.toString().padLeft(2, '0') +
-                        ":" +
-                        today.minute.toString().padLeft(2, '0')));
-                prefs.setString('mood' + count.toString(), extendedMood);
+                save();
                 listPage();
               },
               child: Text(
@@ -147,6 +135,26 @@ class _NewDreamPageState extends State<NewDreamPage> {
       context,
       MaterialPageRoute(builder: (context) => ListOfDreamsPage()),
     );
+  }
+
+  void save() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final count = ((prefs.getInt('counter') ?? 0) + 1);
+    prefs.setInt('counter', count);
+    prefs.setString('dream' + count.toString(), inputDream.text);
+    var today = DateTime.now();
+    prefs.setString(
+        'date' + count.toString(),
+        (today.year.toString() +
+            "-" +
+            today.month.toString().padLeft(2, '0') +
+            "-" +
+            today.day.toString().padLeft(2, '0') +
+            " " +
+            today.hour.toString().padLeft(2, '0') +
+            ":" +
+            today.minute.toString().padLeft(2, '0')));
+    prefs.setString('mood' + count.toString(), extendedMood);
   }
 }
 
@@ -193,10 +201,13 @@ class _DreamsPageState extends State<DreamsPage> {
         final dream = prefs.getString('dream' + (i + 1).toString()) ?? "";
         final date = prefs.getString('date' + (i + 1).toString()) ?? "";
         final mood = prefs.getString('mood' + (i + 1).toString()) ?? "";
-        TableRow tr = TableRow(children: [
+        TableRow tr = TableRow(
+            children: [
           Text(date),
           Text(mood),
-          OutlinedButton(
+
+          OutlineButton(
+
             onPressed: () {
               // Respond to button press
             },
@@ -204,7 +215,16 @@ class _DreamsPageState extends State<DreamsPage> {
               "Detail",
               style: TextStyle(color: Colors.green),
             ),
+            borderSide: BorderSide(
+                color: Colors.green,
+                width: 1,
+                style: BorderStyle.solid
+            ),
+            hoverColor: Colors.green,
+            focusColor: Colors.green,
           ),
+
+
         ]);
         items.add(tr);
       }
@@ -221,9 +241,58 @@ class _DreamsPageState extends State<DreamsPage> {
         body: Column(
           children: [
             SizedBox(
-              height: 19,
+              height: 20,
             ),
-            Table(children: items)
+            Table(
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                border: TableBorder(
+                  horizontalInside: BorderSide(
+                    width: 1,
+                        color: Colors.green
+                  ),
+
+                ),
+                columnWidths: {
+                  0: FlexColumnWidth(1),
+                  1: FlexColumnWidth(1),
+                  2: FlexColumnWidth(1),
+                },
+                children: items),
+            Column(
+              /*
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.end,
+              */
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+
+            OutlineButton(
+
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NewDreamPage(title: 'New Dream')),
+                );
+              },
+              child: Text(
+                "New dream",
+                style: TextStyle(color: Colors.green),
+
+
+
+
+              ),
+              borderSide: BorderSide(
+                color: Colors.green,
+                width: 2,
+                style: BorderStyle.solid
+              ),
+              hoverColor: Colors.green,
+              focusColor: Colors.green,
+
+              )
+            ],
+              )
           ],
         ));
   }
