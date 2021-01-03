@@ -9,7 +9,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Dreams notes',
       theme: ThemeData.dark(),
       home: NewDreamPage(title: 'New Dream'),
     );
@@ -27,7 +27,7 @@ class NewDreamPage extends StatefulWidget {
 
 class _NewDreamPageState extends State<NewDreamPage> {
   TextEditingController inputDream =new TextEditingController();
-  String valueDream = "";
+
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +73,7 @@ class _NewDreamPageState extends State<NewDreamPage> {
             OutlinedButton(
 
             onPressed: () {
-                // Respond to button press
+                listPage();
               },
               child:
               Text(
@@ -84,10 +84,10 @@ class _NewDreamPageState extends State<NewDreamPage> {
             OutlinedButton(
               onPressed: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
-                final old = prefs.getString('dream') ?? "";
-                valueDream = old + " " + inputDream.text;
-                prefs.setString('dream', valueDream);
-                // Respond to button press
+                final count = ((prefs.getInt('counter') ?? 0) + 1);
+                prefs.setInt('counter', count);
+                prefs.setString('dream' + count.toString(), inputDream.text);
+                listPage();
               },
               child: Text(
                 "Save",
@@ -97,6 +97,68 @@ class _NewDreamPageState extends State<NewDreamPage> {
           ]),
         ]));
   }
+
+  void listPage() {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ListOfDreamsPage()),
+    );
+  }
 }
+
+class ListOfDreamsPage extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    SharedPreferences prefs;
+    getValues () async {
+      prefs = await SharedPreferences.getInstance();
+    }
+    getValues();
+    return MaterialApp(
+      title: 'Dreams notes',
+      theme: ThemeData.dark(),
+      home: DreamsPage(prefs: prefs),
+    );
+  }
+}
+
+class DreamsPage extends StatefulWidget {
+  DreamsPage({Key key, this.prefs}) : super(key: key);
+  SharedPreferences prefs;
+
+  @override
+  _DreamsPageState createState() => _DreamsPageState();
+}
+
+class _DreamsPageState extends State<DreamsPage> {
+  @override
+  var dreams = new List<Widget>();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPrefs();
+  }
+
+  _loadPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      final count = (prefs.getInt('counter')) ?? 0;
+      for (int i = 0; i < count; i++) {
+        final dream = prefs.getString('dream' + (i+1).toString()) ?? "";
+        dreams.add(Text(dream));
+      }});
+  }
+
+    Widget build(BuildContext context) {
+    return Material(
+        child:
+        Column(children: dreams),
+    );
+  }
+}
+
+
 
 
