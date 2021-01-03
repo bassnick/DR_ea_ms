@@ -123,13 +123,13 @@ class _NewDreamPageState extends State<NewDreamPage> {
                     'date' + count.toString(),
                     (today.year.toString() +
                         "-" +
-                        today.month.toString() +
+                        today.month.toString().padLeft(2, '0') +
                         "-" +
-                        today.day.toString() +
+                        today.day.toString().padLeft(2, '0') +
                         " " +
-                        today.hour.toString() +
+                        today.hour.toString().padLeft(2, '0') +
                         ":" +
-                        today.minute.toString()));
+                        today.minute.toString().padLeft(2, '0')));
                 prefs.setString('mood' + count.toString(), extendedMood);
                 listPage();
               },
@@ -177,7 +177,7 @@ class DreamsPage extends StatefulWidget {
 
 class _DreamsPageState extends State<DreamsPage> {
   @override
-  var items = new List<Widget>();
+  var items = new List<TableRow>();
 
   @override
   void initState() {
@@ -193,15 +193,38 @@ class _DreamsPageState extends State<DreamsPage> {
         final dream = prefs.getString('dream' + (i + 1).toString()) ?? "";
         final date = prefs.getString('date' + (i + 1).toString()) ?? "";
         final mood = prefs.getString('mood' + (i + 1).toString()) ?? "";
-
-        items.add(Text(date + ' ' + mood));
+        TableRow tr = TableRow(children: [
+          Text(date),
+          Text(mood),
+          OutlinedButton(
+            onPressed: () {
+              // Respond to button press
+            },
+            child: Text(
+              "Detail",
+              style: TextStyle(color: Colors.green),
+            ),
+          ),
+        ]);
+        items.add(tr);
       }
     });
   }
 
   Widget build(BuildContext context) {
-    return Material(
-      child: Column(children: items),
-    );
+    return Scaffold(
+        appBar: AppBar(
+            title: Text(
+          'List of your dreams:',
+          style: TextStyle(color: Colors.green),
+        )),
+        body: Column(
+          children: [
+            SizedBox(
+              height: 19,
+            ),
+            Table(children: items)
+          ],
+        ));
   }
 }
