@@ -26,8 +26,31 @@ class NewDreamPage extends StatefulWidget {
 }
 
 class _NewDreamPageState extends State<NewDreamPage> {
-  TextEditingController inputDream =new TextEditingController();
+  TextEditingController inputDream = new TextEditingController();
+  var extendedMood;
+  var _currentSliderValue = 0.0;
 
+  String getMood(double currentValue) {
+    String mood = "Excellent";
+    extendedMood = "++ " + mood;
+    if (currentValue < 1.5) {
+      mood = "Good";
+      extendedMood = "+ " + mood;
+    }
+    if (currentValue < 0.5) {
+      mood = "Neutral";
+      extendedMood = "0 " + mood;
+    }
+    if (currentValue < -0.5) {
+      mood = "Bad";
+      extendedMood = "- " + mood;
+    }
+    if (currentValue < -1.5) {
+      mood = "NightMare";
+      extendedMood = "-- " + mood;
+    }
+    return mood;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,11 +80,21 @@ class _NewDreamPageState extends State<NewDreamPage> {
                 ),
                 hintText: 'Enter the dream'),
           ),
-              Row( mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-
-                    OutlinedButton(
-
+          Slider(
+            value: _currentSliderValue,
+            min: -2,
+            max: 2,
+            divisions: 4,
+            activeColor: Colors.green,
+            label: getMood(_currentSliderValue),
+            onChanged: (double value) {
+              setState(() {
+                _currentSliderValue = value;
+              });
+            },
+          ),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            OutlinedButton(
               onPressed: () {
                 // Respond to button press
               },
@@ -71,12 +104,10 @@ class _NewDreamPageState extends State<NewDreamPage> {
               ),
             ),
             OutlinedButton(
-
-            onPressed: () {
+              onPressed: () {
                 listPage();
               },
-              child:
-              Text(
+              child: Text(
                 "List of dreams",
                 style: TextStyle(color: Colors.green),
               ),
@@ -87,6 +118,19 @@ class _NewDreamPageState extends State<NewDreamPage> {
                 final count = ((prefs.getInt('counter') ?? 0) + 1);
                 prefs.setInt('counter', count);
                 prefs.setString('dream' + count.toString(), inputDream.text);
+                var today = DateTime.now();
+                prefs.setString(
+                    'date' + count.toString(),
+                    (today.year.toString() +
+                        "-" +
+                        today.month.toString() +
+                        "-" +
+                        today.day.toString() +
+                        " " +
+                        today.hour.toString() +
+                        ":" +
+                        today.minute.toString()));
+                prefs.setString('mood' + count.toString(), extendedMood);
                 listPage();
               },
               child: Text(
@@ -99,21 +143,21 @@ class _NewDreamPageState extends State<NewDreamPage> {
   }
 
   void listPage() {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ListOfDreamsPage()),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ListOfDreamsPage()),
     );
   }
 }
 
 class ListOfDreamsPage extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     SharedPreferences prefs;
-    getValues () async {
+    getValues() async {
       prefs = await SharedPreferences.getInstance();
     }
+
     getValues();
     return MaterialApp(
       title: 'Dreams notes',
@@ -133,7 +177,7 @@ class DreamsPage extends StatefulWidget {
 
 class _DreamsPageState extends State<DreamsPage> {
   @override
-  var dreams = new List<Widget>();
+  var items = new List<Widget>();
 
   @override
   void initState() {
@@ -146,19 +190,18 @@ class _DreamsPageState extends State<DreamsPage> {
     setState(() {
       final count = (prefs.getInt('counter')) ?? 0;
       for (int i = 0; i < count; i++) {
-        final dream = prefs.getString('dream' + (i+1).toString()) ?? "";
-        dreams.add(Text(dream));
-      }});
+        final dream = prefs.getString('dream' + (i + 1).toString()) ?? "";
+        final date = prefs.getString('date' + (i + 1).toString()) ?? "";
+        final mood = prefs.getString('mood' + (i + 1).toString()) ?? "";
+
+        items.add(Text(date + ' ' + mood));
+      }
+    });
   }
 
-    Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Material(
-        child:
-        Column(children: dreams),
+      child: Column(children: items),
     );
   }
 }
-
-
-
-
