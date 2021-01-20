@@ -62,7 +62,7 @@ class _NewDreamPageState extends State<NewDreamPage> {
             style: TextStyle(color: Colors.green),
           ),
         ),
-        body: Column(children: [
+        body: ListView(shrinkWrap: true, children: [
           TextField(
             controller: inputDream,
             style: TextStyle(color: Colors.white38),
@@ -99,7 +99,8 @@ class _NewDreamPageState extends State<NewDreamPage> {
                 save();
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => NewDreamPage(title: 'New Dream')),
+                  MaterialPageRoute(
+                      builder: (context) => NewDreamPage(title: 'New Dream')),
                 );
               },
               child: Text(
@@ -201,30 +202,30 @@ class _DreamsPageState extends State<DreamsPage> {
         final dream = prefs.getString('dream' + (i + 1).toString()) ?? "";
         final date = prefs.getString('date' + (i + 1).toString()) ?? "";
         final mood = prefs.getString('mood' + (i + 1).toString()) ?? "";
-        TableRow tr = TableRow(
-            children: [
+        TableRow tr = TableRow(children: [
           Text(date),
           Text(mood),
-
           OutlineButton(
-
             onPressed: () {
-              // Respond to button press
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DetailDreamPage(
+                        title: 'Detail Dream',
+                        dream: dream,
+                        date: date,
+                        mood: mood)),
+              );
             },
             child: Text(
               "Detail",
               style: TextStyle(color: Colors.green),
             ),
             borderSide: BorderSide(
-                color: Colors.green,
-                width: 1,
-                style: BorderStyle.solid
-            ),
+                color: Colors.green, width: 1, style: BorderStyle.solid),
             hoverColor: Colors.green,
             focusColor: Colors.green,
           ),
-
-
         ]);
         items.add(tr);
       }
@@ -238,7 +239,8 @@ class _DreamsPageState extends State<DreamsPage> {
           'List of your dreams:',
           style: TextStyle(color: Colors.green),
         )),
-        body: Column(
+        body: ListView(
+          shrinkWrap: true,
           children: [
             SizedBox(
               height: 20,
@@ -246,11 +248,7 @@ class _DreamsPageState extends State<DreamsPage> {
             Table(
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                 border: TableBorder(
-                  horizontalInside: BorderSide(
-                    width: 1,
-                        color: Colors.green
-                  ),
-
+                  horizontalInside: BorderSide(width: 1, color: Colors.green),
                 ),
                 columnWidths: {
                   0: FlexColumnWidth(1),
@@ -265,35 +263,69 @@ class _DreamsPageState extends State<DreamsPage> {
               */
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-
-            OutlineButton(
-
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => NewDreamPage(title: 'New Dream')),
-                );
-              },
-              child: Text(
-                "New dream",
-                style: TextStyle(color: Colors.green),
-
-
-
-
-              ),
-              borderSide: BorderSide(
-                color: Colors.green,
-                width: 2,
-                style: BorderStyle.solid
-              ),
-              hoverColor: Colors.green,
-              focusColor: Colors.green,
-
-              )
-            ],
-              )
+                OutlineButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              NewDreamPage(title: 'New Dream')),
+                    );
+                  },
+                  child: Text(
+                    "New dream",
+                    style: TextStyle(color: Colors.green),
+                  ),
+                  borderSide: BorderSide(
+                      color: Colors.green, width: 2, style: BorderStyle.solid),
+                  hoverColor: Colors.green,
+                  focusColor: Colors.green,
+                )
+              ],
+            )
           ],
         ));
+  }
+}
+
+class DetailDreamPage extends StatefulWidget {
+  DetailDreamPage({Key key, this.title, this.dream, this.date, this.mood})
+      : super(key: key);
+  final String title;
+  final String dream;
+  final String date;
+  final String mood;
+
+  @override
+  _DetailDreamPage createState() => _DetailDreamPage();
+}
+
+class _DetailDreamPage extends State<DetailDreamPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black38,
+      appBar: AppBar(
+        title: Text(
+          widget.title,
+          style: TextStyle(color: Colors.green),
+        ),
+      ),
+      body: ListView(
+        children: [
+          Text(widget.dream,
+              style: TextStyle(color: Colors.green, fontSize: 25)),
+          SizedBox(height: 60),
+          Row(children: [
+            Text(widget.mood,
+                style: TextStyle(color: Colors.green, fontSize: 15)),
+            SizedBox(width: 60),
+            Text(widget.date,
+                style: TextStyle(color: Colors.green, fontSize: 15))
+          ])
+        ],
+        shrinkWrap: true,
+      ),
+    );
   }
 }
