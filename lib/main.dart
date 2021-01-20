@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 void main() {
   runApp(MyApp());
@@ -139,46 +140,42 @@ class _NewDreamPageState extends State<NewDreamPage> {
   }
 
   void save() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    final count = ((prefs.getInt('counter') ?? 0) + 1);
-    prefs.setInt('counter', count);
-    prefs.setString('dream' + count.toString(), inputDream.text);
+    //final count = ((prefs.getInt('counter') ?? 0) + 1);
     var today = DateTime.now();
-    prefs.setString(
-        'date' + count.toString(),
-        (today.year.toString() +
-            "-" +
-            today.month.toString().padLeft(2, '0') +
-            "-" +
-            today.day.toString().padLeft(2, '0') +
-            " " +
-            today.hour.toString().padLeft(2, '0') +
-            ":" +
-            today.minute.toString().padLeft(2, '0')));
-    prefs.setString('mood' + count.toString(), extendedMood);
+    String date = (today.year.toString() +
+        "-" +
+        today.month.toString().padLeft(2, '0') +
+        "-" +
+        today.day.toString().padLeft(2, '0') +
+        " " +
+        today.hour.toString().padLeft(2, '0') +
+        ":" +
+        today.minute.toString().padLeft(2, '0'));
+    String csvRows = "";
+    content += setCSV(date, extendedMood, inputDream.text);
+    await saveFile(content);
   }
 }
 
 class ListOfDreamsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    SharedPreferences prefs;
     getValues() async {
-      prefs = await SharedPreferences.getInstance();
+      String result = await readFile();
     }
 
     getValues();
+
     return MaterialApp(
       title: 'Dreams notes',
       theme: ThemeData.dark(),
-      home: DreamsPage(prefs: prefs),
+      home: DreamsPage(),
     );
   }
 }
 
 class DreamsPage extends StatefulWidget {
-  DreamsPage({Key key, this.prefs}) : super(key: key);
-  SharedPreferences prefs;
+  DreamsPage({Key key}) : super(key: key);
 
   @override
   _DreamsPageState createState() => _DreamsPageState();
@@ -191,45 +188,43 @@ class _DreamsPageState extends State<DreamsPage> {
   @override
   void initState() {
     super.initState();
-    _loadPrefs();
-  }
+    if (content == null) return;
+    List<String> rows = content.split("\r\n");
+    final counter = rows == null ? 0 : rows.length;
+    for (int i = 0; i < counter - 1; i++) {
+      List<String> it = rows[i].split(',');
 
-  _loadPrefs() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      final count = (prefs.getInt('counter')) ?? 0;
-      for (int i = 0; i < count; i++) {
-        final dream = prefs.getString('dream' + (i + 1).toString()) ?? "";
-        final date = prefs.getString('date' + (i + 1).toString()) ?? "";
-        final mood = prefs.getString('mood' + (i + 1).toString()) ?? "";
-        TableRow tr = TableRow(children: [
-          Text(date),
-          Text(mood),
-          OutlineButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => DetailDreamPage(
-                        title: 'Detail Dream',
-                        dream: dream,
-                        date: date,
-                        mood: mood)),
-              );
-            },
-            child: Text(
-              "Detail",
-              style: TextStyle(color: Colors.green),
-            ),
-            borderSide: BorderSide(
-                color: Colors.green, width: 1, style: BorderStyle.solid),
-            hoverColor: Colors.green,
-            focusColor: Colors.green,
+      String date = it[0];
+      String mood = it[1];
+      String dream = rows[i].replaceFirst(date + "," + mood + ",", '');
+
+      TableRow tr = TableRow(children: [
+        Text(date),
+        Text(mood),
+        OutlineButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => DetailDreamPage(
+                      title: 'Detail Dream',
+                      dream: dream,
+                      date: date,
+                      mood: mood)),
+            );
+          },
+          child: Text(
+            "Detail",
+            style: TextStyle(color: Colors.green),
           ),
-        ]);
-        items.add(tr);
-      }
-    });
+          borderSide: BorderSide(
+              color: Colors.green, width: 1, style: BorderStyle.solid),
+          hoverColor: Colors.green,
+          focusColor: Colors.green,
+        ),
+      ]);
+      items.add(tr);
+    }
   }
 
   Widget build(BuildContext context) {
@@ -329,3 +324,37 @@ class _DetailDreamPage extends State<DetailDreamPage> {
     );
   }
 }
+
+String setCSV(String date, String mood, String dream) {
+  String rowString = "";
+  rowString += "" +
+      date +
+      "," +
+      mood +
+      "," +
+      dream +
+      "\r\n";
+  return rowString;
+}
+
+Future<String> getFilePath() async {
+  Directory appDocumentsDirectory =
+      await getApplicationDocumentsDirectory(); // 1
+  String appDocumentsPath = appDocumentsDirectory.path; // 2
+  String filePath = '$appDocumentsPath/dreamsRecords.txt'; // 3
+
+  return filePath;
+}
+
+void saveFile(String text) async {
+  File file = File(await getFilePath()); // 1
+  file.writeAsString(text); // 2
+}
+
+Future<String> readFile() async {
+  File file = File(await getFilePath()); // 1
+  content = await file.readAsString(); // 2
+  return content;
+}
+
+String content = "";
