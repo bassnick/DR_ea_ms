@@ -189,6 +189,14 @@ class _DreamsPageState extends State<DreamsPage> {
   void initState() {
     super.initState();
     if (content == null) return;
+    TableRow trHeader = TableRow(children: [
+        Text('Date', style: TextStyle(color: Colors.green)),
+        Text('Mood', style: TextStyle(color: Colors.green)),
+        Text('    ', style: TextStyle(height: 3),)]);
+    items.add(trHeader);
+
+
+
     List<String> rows = content.split("\r\n");
     final counter = rows == null ? 0 : rows.length;
     for (int i = 0; i < counter - 1; i++) {
@@ -327,16 +335,10 @@ class _DetailDreamPage extends State<DetailDreamPage> {
 
 String setCSV(String date, String mood, String dream) {
   String rowString = "";
-  rowString += "" +
-      date +
-      "," +
-      mood +
-      "," +
-      dream +
-      "\r\n";
+  rowString += "" + date + "," + mood + "," + dream + "\r\n";
   return rowString;
 }
-
+/*
 Future<String> getFilePath() async {
   Directory appDocumentsDirectory =
       await getApplicationDocumentsDirectory(); // 1
@@ -344,17 +346,22 @@ Future<String> getFilePath() async {
   String filePath = '$appDocumentsPath/dreamsRecords.txt'; // 3
 
   return filePath;
-}
+}*/
 
 void saveFile(String text) async {
-  File file = File(await getFilePath()); // 1
-  file.writeAsString(text); // 2
+  var file = File(
+      '/storage/emulated/0/Android/data/cz.bassnick.dr_ea_ms/exp.txt'); // 1
+  var sink = file.openWrite(); // 2
+  sink.write(text);
+  await sink.flush();
+  await sink.close();
 }
 
-Future<String> readFile() async {
-  File file = File(await getFilePath()); // 1
+Future readFile() async {
+  File file = File(
+      '/storage/emulated/0/Android/data/cz.bassnick.dr_ea_ms/exp.txt'); // 1
   content = await file.readAsString(); // 2
-  return content;
+  print(content);
 }
 
 String content = "";
