@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -185,13 +186,18 @@ class _DreamsPageState extends State<DreamsPage> {
   @override
   var items = new List<TableRow>();
 
+  int sortType = 0; // 0-date asc, 1-date desc, 2-mood asc, 3-mood desc
+  bool dateUp =true;
+  bool moodUp = true;
+
+
   @override
   void initState() {
     super.initState();
     if (content == null) return;
     TableRow trHeader = TableRow(children: [
-        Text('Date', style: TextStyle(color: Colors.green)),
-        Text('Mood', style: TextStyle(color: Colors.green)),
+        FlatButton(padding: EdgeInsets.all(8.0), child: Align(alignment: Alignment.centerLeft, child: Text('Date', textAlign: TextAlign.left, style: TextStyle(color: Colors.green))), onPressed: () { dateUp = !dateUp; if (dateUp) sortType = 0; else sortType = 1;}),
+        FlatButton(padding: EdgeInsets.all(8.0), child: Align(alignment: Alignment.centerLeft, child: Text('Mood',  textAlign: TextAlign.left, style: TextStyle(color: Colors.green))), onPressed: () { moodUp = !moodUp; if (moodUp) sortType = 2; else sortType = 3;}),
         Text('    ', style: TextStyle(height: 3),)]);
     items.add(trHeader);
 
@@ -202,8 +208,8 @@ class _DreamsPageState extends State<DreamsPage> {
     for (int i = 0; i < counter - 1; i++) {
       List<String> it = rows[i].split(',');
 
-      String date = it[0];
-      String mood = it[1];
+      String date = '  ' + it[0];
+      String mood = '  ' + it[1];
       String dream = rows[i].replaceFirst(date + "," + mood + ",", '');
 
       TableRow tr = TableRow(children: [
