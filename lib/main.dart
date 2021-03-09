@@ -210,7 +210,7 @@ class _DreamsPageState extends State<DreamsPage> {
 
       String date = '  ' + it[0];
       String mood = '  ' + it[1];
-      String dream = rows[i].replaceFirst(date + "," + mood + ",", '');
+      String dream = rows[i].replaceFirst(""+it[0] + "," + it[1] + ",", '');
 
       TableRow tr = TableRow(children: [
         Text(date),
