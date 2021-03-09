@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -185,18 +186,31 @@ class _DreamsPageState extends State<DreamsPage> {
   @override
   var items = new List<TableRow>();
 
+  int sortType = 0; // 0-date asc, 1-date desc, 2-mood asc, 3-mood desc
+  bool dateUp =true;
+  bool moodUp = true;
+
+
   @override
   void initState() {
     super.initState();
     if (content == null) return;
+    TableRow trHeader = TableRow(children: [
+        FlatButton(padding: EdgeInsets.all(8.0), child: Align(alignment: Alignment.centerLeft, child: Text('Date', textAlign: TextAlign.left, style: TextStyle(color: Colors.green))), onPressed: () { dateUp = !dateUp; if (dateUp) sortType = 0; else sortType = 1;}),
+        FlatButton(padding: EdgeInsets.all(8.0), child: Align(alignment: Alignment.centerLeft, child: Text('Mood',  textAlign: TextAlign.left, style: TextStyle(color: Colors.green))), onPressed: () { moodUp = !moodUp; if (moodUp) sortType = 2; else sortType = 3;}),
+        Text('    ', style: TextStyle(height: 3),)]);
+    items.add(trHeader);
+
+
+
     List<String> rows = content.split("\r\n");
     final counter = rows == null ? 0 : rows.length;
     for (int i = 0; i < counter - 1; i++) {
       List<String> it = rows[i].split(',');
 
-      String date = it[0];
-      String mood = it[1];
-      String dream = rows[i].replaceFirst(date + "," + mood + ",", '');
+      String date = '  ' + it[0];
+      String mood = '  ' + it[1];
+      String dream = rows[i].replaceFirst(""+it[0] + "," + it[1] + ",", '');
 
       TableRow tr = TableRow(children: [
         Text(date),
@@ -327,13 +341,7 @@ class _DetailDreamPage extends State<DetailDreamPage> {
 
 String setCSV(String date, String mood, String dream) {
   String rowString = "";
-  rowString += "" +
-      date +
-      "," +
-      mood +
-      "," +
-      dream +
-      "\r\n";
+  rowString += "" + date + "," + mood + "," + dream + "\r\n";
   return rowString;
 }
 /*
@@ -346,9 +354,9 @@ Future<String> getFilePath() async {
   return filePath;
 }*/
 
-
 void saveFile(String text) async {
-  var file = File('/storage/emulated/0/Android/data/cz.bassnick.dr_ea_ms/exp.txt'); // 1
+  var file = File(
+      '/storage/emulated/0/Android/data/cz.bassnick.dr_ea_ms/exp.txt'); // 1
   var sink = file.openWrite(); // 2
   sink.write(text);
   await sink.flush();
@@ -356,10 +364,10 @@ void saveFile(String text) async {
 }
 
 Future readFile() async {
-  File file = File('/storage/emulated/0/Android/data/cz.bassnick.dr_ea_ms/exp.txt'); // 1
+  File file = File(
+      '/storage/emulated/0/Android/data/cz.bassnick.dr_ea_ms/exp.txt'); // 1
   content = await file.readAsString(); // 2
   print(content);
 }
 
 String content = "";
-
